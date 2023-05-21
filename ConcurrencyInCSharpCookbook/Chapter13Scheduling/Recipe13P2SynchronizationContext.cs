@@ -61,7 +61,7 @@ namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling
             dump1.Proof.Should().Be(dump2.Proof).And.Be(1, "At this stage, we are in the main thread.");
             dump4.Should().BeEquivalentTo(dump5).And.BeEquivalentTo(dump7).And.BeEquivalentTo(dump8).And.BeEquivalentTo(dump10, 
                 "These instructions are executed by the custom synchronization context and shares the same thread.");
-            dump3.Proof.Should().Be(dump6.Proof).And.Be(dump9.Proof, 
+            dump3.Proof.Should().Be(dump6.Proof).And.Be(dump9.Proof).And.Be(0, 
                 "These tasks are executed by the default task scheduler and therefore in the thread pool.");
         }
 
