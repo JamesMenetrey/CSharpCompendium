@@ -4,7 +4,7 @@ using FluentAssertions;
 namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling
 {
     [TestClass]
-    public class Recipe13P2TaskScheduler
+    public class Recipe13P2SynchronizationContext
     {
         [ThreadStatic]
         private static int _localThreadProof;
