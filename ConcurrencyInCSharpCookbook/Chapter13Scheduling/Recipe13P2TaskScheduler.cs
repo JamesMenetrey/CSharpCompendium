@@ -6,6 +6,10 @@ namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling
     [TestClass]
     public class Recipe13P2TaskScheduler
     {
+        /// <summary>
+        /// A thread-bound variable to identify where the logic is executed.
+        /// The value is either 1 for main thread, 2 for custom single thread, or 0 otherwise (for the thread pool).
+        /// </summary>
         [ThreadStatic]
         private static int _localThreadProof;
 
@@ -17,6 +21,7 @@ namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling
         public async Task DemonstrateHowCustomTaskSchedulerWorks()
         {
             var cancellation = new CancellationTokenSource();
+            // Create a custom task scheduler and a factory to schedule tasks.
             var taskScheduler = new MyTaskScheduler(cancellation.Token);
             var taskFactory = new TaskFactory(taskScheduler);
             _localThreadProof = 1;
