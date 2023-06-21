@@ -5,6 +5,10 @@ namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics;
 
 /// <summary>
 /// List some best practices to create <see cref="ValueTask"/>.
+/// 
+/// Note that we prefer to use <see cref="Task"/> over <see cref="ValueTask"/> generally, unless benchmarked otherwise.
+/// <see cref="ValueTask"/> is usually used when most of the asynchronous logic can end up synchronous, or to lower
+/// very frequent API to lower the pressure on the heap allocation.
 /// </summary>
 [TestClass]
 public class Recipe2P10CreateValueTasks
