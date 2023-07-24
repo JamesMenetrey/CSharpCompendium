@@ -6,15 +6,18 @@ namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling;
 public class Recipe13P2ExclusiveScheduler
 {
     /// <summary>
-    /// The task scheduler <see cref="ConcurrentExclusiveSchedulerPair"/> includes two <see cref="TaskScheduler"/>s.
-    /// The first one, <see cref="ConcurrentExclusiveSchedulerPair.ConcurrentScheduler"/>, enables to execute tasks
-    /// concurrently, as long as <see cref="ConcurrentExclusiveSchedulerPair.ExclusiveScheduler"/> is not executing
-    /// a task. The second one, <see cref="ConcurrentExclusiveSchedulerPair.ExclusiveScheduler"/>, only executes
+    /// The task scheduler <see cref="ConcurrentExclusiveSchedulerPair" /> includes two <see cref="TaskScheduler" />s.
+    /// The first one, <see cref="ConcurrentExclusiveSchedulerPair.ConcurrentScheduler" />, enables to execute tasks
+    /// concurrently, as long as <see cref="ConcurrentExclusiveSchedulerPair.ExclusiveScheduler" /> is not executing
+    /// a task. The second one, <see cref="ConcurrentExclusiveSchedulerPair.ExclusiveScheduler" />, only executes
     /// on task at a time.
     /// </summary>
     [TestMethod]
     public async Task UseConcurrentExclusiveScheduler()
     {
+        // Only assess the concurrency if more than one core is available.
+        if (Environment.ProcessorCount < 2) Assert.Inconclusive();
+
         var scheduler = new ConcurrentExclusiveSchedulerPair();
         var concurrent = scheduler.ConcurrentScheduler;
         var exclusive = scheduler.ExclusiveScheduler;
@@ -36,7 +39,13 @@ public class Recipe13P2ExclusiveScheduler
                 // In the case we are in the last iteration, the tasks2 must have already started.
                 if (i == array1.Length - 1)
                 {
-                    array2[0].Should().BeGreaterThan(0);
+                    // Only assess the concurrency if more than one core is available.
+                    if (Environment.ProcessorCount > 1)
+                    {
+                        array2[0].Should().BeGreaterThan(0);
+                    }
+                    
+                    Console.WriteLine($">> {Environment.ProcessorCount}");
                 }
             }
         });
