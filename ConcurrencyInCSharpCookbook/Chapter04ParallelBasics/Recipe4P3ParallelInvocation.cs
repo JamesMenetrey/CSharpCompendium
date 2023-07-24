@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter4ParallelBasics;
+namespace ConcurrencyInCSharpCookbook.Chapter04ParallelBasics;
 
 [TestClass]
 public class Recipe4P3ParallelInvocation

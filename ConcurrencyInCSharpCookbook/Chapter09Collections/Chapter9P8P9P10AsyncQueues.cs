@@ -1,7 +1,7 @@
 ﻿using System.Threading.Channels;
 using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter9Collections;
+namespace ConcurrencyInCSharpCookbook.Chapter09Collections;
 
 [TestClass]
 public class Chapter9P8P9P10AsyncQueues

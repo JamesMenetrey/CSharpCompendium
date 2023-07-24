@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics;
+namespace ConcurrencyInCSharpCookbook.Chapter02AsyncBasics;
 
 [TestClass]
 public class Recipe2P1Timeout

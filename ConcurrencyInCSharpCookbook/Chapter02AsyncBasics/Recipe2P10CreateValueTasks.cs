@@ -1,18 +1,19 @@
 using System.Threading.Tasks.Sources;
 using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics;
+namespace ConcurrencyInCSharpCookbook.Chapter02AsyncBasics;
 
 /// <summary>
-/// List some best practices to create <see cref="ValueTask"/>.
-/// 
-/// Note that we prefer to use <see cref="Task"/> over <see cref="ValueTask"/> generally, unless benchmarked otherwise.
-/// <see cref="ValueTask"/> is usually used when most of the asynchronous logic can end up synchronous, or to lower
+/// List some best practices to create <see cref="ValueTask" />.
+/// Note that we prefer to use <see cref="Task" /> over <see cref="ValueTask" /> generally, unless benchmarked otherwise.
+/// <see cref="ValueTask" /> is usually used when most of the asynchronous logic can end up synchronous, or to lower
 /// very frequent API to lower the pressure on the heap allocation.
 /// </summary>
 [TestClass]
 public class Recipe2P10CreateValueTasks
 {
+    private static bool _mustBeAsync;
+
     [TestMethod]
     public async Task ConsumeSimpleValueTask()
     {
@@ -24,8 +25,6 @@ public class Recipe2P10CreateValueTasks
 
         (await ReturnSimpleValueTask()).Should().Be(42);
     }
-
-    private static bool _mustBeAsync;
 
     [TestMethod]
     public async Task ConsumeSynchronousValueTaskMostOfTime()
@@ -60,8 +59,8 @@ public class Recipe2P10CreateValueTasks
     }
 
     /// <summary>
-    /// Prevents the allocation of the source of <see cref="ValueTask"/> to minimize the heap allocation pressure.
-    /// This is demonstrated using a custom class which delays operation in time (<see cref="DelayOperation"/>).
+    /// Prevents the allocation of the source of <see cref="ValueTask" /> to minimize the heap allocation pressure.
+    /// This is demonstrated using a custom class which delays operation in time (<see cref="DelayOperation" />).
     /// </summary>
     [TestMethod]
     public async Task UsePooledValueTaskSource()
@@ -81,16 +80,17 @@ public class Recipe2P10CreateValueTasks
     }
 
     /// <summary>
-    /// A wrapper around the .NET built-in type <see cref="ManualResetValueTaskSourceCore{T}"/>, used to prevent
-    /// the heap allocation of instances of <see cref="Task"/>.
-    /// The method <see cref="GetValueTask"/> creates a new struct (stack-allocated) <see cref="ValueTask"/> on each
-    /// call which represents the same underlying <see cref="ManualResetValueTaskSource{T}"/>.
-    /// This type is a class (not a struct), so it is referenced (not copied) by the <see cref="ValueTask"/> instances.
+    /// A wrapper around the .NET built-in type <see cref="ManualResetValueTaskSourceCore{T}" />, used to prevent
+    /// the heap allocation of instances of <see cref="Task" />.
+    /// The method <see cref="GetValueTask" /> creates a new struct (stack-allocated) <see cref="ValueTask" /> on each
+    /// call which represents the same underlying <see cref="ManualResetValueTaskSource{T}" />.
+    /// This type is a class (not a struct), so it is referenced (not copied) by the <see cref="ValueTask" /> instances.
     /// </summary>
     /// <seealso href="https://github.com/dotnet/runtime/issues/27558#issue-558423566">
-    /// The implementation of <see cref="ManualResetValueTaskSource{T}"/> by Microsoft (Stephen Toub).
+    /// The implementation of <see cref="ManualResetValueTaskSource{T}" /> by Microsoft (Stephen Toub).
     /// </seealso>
-    /// <seealso href="https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.sources.manualresetvaluetasksourcecore-1"/>
+    /// <seealso
+    ///     href="https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.sources.manualresetvaluetasksourcecore-1" />
     private class ManualResetValueTaskSource<T> : IValueTaskSource<T>, IValueTaskSource
     {
         private ManualResetValueTaskSourceCore<T> _logic; // mutable struct; do not make this readonly
@@ -101,45 +101,81 @@ public class Recipe2P10CreateValueTasks
             set => _logic.RunContinuationsAsynchronously = value;
         }
 
-        /// <summary>
-        /// The <see cref="ManualResetValueTaskSourceCore{T}.Version"/> is a safety check value to make sure the
-        /// <see cref="ValueTask"/> is not awaited many times. Internally, this is an incremented number.
-        /// </summary>
-        public ValueTask<T> GetValueTask() => new(this, _logic.Version);
-        public void Reset() => _logic.Reset();
-        public void SetResult(T result) => _logic.SetResult(result);
-        public void SetException(Exception error) => _logic.SetException(error);
+        void IValueTaskSource.GetResult(short token)
+        {
+            _logic.GetResult(token);
+        }
 
-        void IValueTaskSource.GetResult(short token) => _logic.GetResult(token);
-        T IValueTaskSource<T>.GetResult(short token) => _logic.GetResult(token);
-
-        ValueTaskSourceStatus IValueTaskSource.GetStatus(short token) => _logic.GetStatus(token);
-        ValueTaskSourceStatus IValueTaskSource<T>.GetStatus(short token) => _logic.GetStatus(token);
+        ValueTaskSourceStatus IValueTaskSource.GetStatus(short token)
+        {
+            return _logic.GetStatus(token);
+        }
 
         void IValueTaskSource.OnCompleted(Action<object?> continuation, object? state, short token,
-            ValueTaskSourceOnCompletedFlags flags) => _logic.OnCompleted(continuation, state, token, flags);
+            ValueTaskSourceOnCompletedFlags flags)
+        {
+            _logic.OnCompleted(continuation, state, token, flags);
+        }
+
+        T IValueTaskSource<T>.GetResult(short token)
+        {
+            return _logic.GetResult(token);
+        }
+
+        ValueTaskSourceStatus IValueTaskSource<T>.GetStatus(short token)
+        {
+            return _logic.GetStatus(token);
+        }
 
         void IValueTaskSource<T>.OnCompleted(Action<object?> continuation, object? state, short token,
-            ValueTaskSourceOnCompletedFlags flags) => _logic.OnCompleted(continuation, state, token, flags);
+            ValueTaskSourceOnCompletedFlags flags)
+        {
+            _logic.OnCompleted(continuation, state, token, flags);
+        }
+
+        /// <summary>
+        /// The <see cref="ManualResetValueTaskSourceCore{T}.Version" /> is a safety check value to make sure the
+        /// <see cref="ValueTask" /> is not awaited many times. Internally, this is an incremented number.
+        /// </summary>
+        public ValueTask<T> GetValueTask()
+        {
+            return new ValueTask<T>(this, _logic.Version);
+        }
+
+        public void Reset()
+        {
+            _logic.Reset();
+        }
+
+        public void SetResult(T result)
+        {
+            _logic.SetResult(result);
+        }
+
+        public void SetException(Exception error)
+        {
+            _logic.SetException(error);
+        }
     }
 
     /// <summary>
-    /// An example of using the type <see cref="ManualResetValueTaskSource{T}"/> to provide asynchronous logic
+    /// An example of using the type <see cref="ManualResetValueTaskSource{T}" /> to provide asynchronous logic
     /// with minimal heap allocation.
     /// </summary>
     public class DelayOperation
     {
         /// <summary>
-        /// The only heap-allocated object, which controls the creation and the completion of <see cref="ValueTask"/>s.
+        /// The only heap-allocated object, which controls the creation and the completion of <see cref="ValueTask" />s.
         /// </summary>
         private readonly ManualResetValueTaskSource<int> _source = new();
+
         private Timer? _timer;
 
         public ValueTask<int> DelayAsync(TimeSpan delay, int result)
         {
             // For the synchronous path, ee can return a new ValueTask without heap or complex allocation.
             if (delay.Equals(TimeSpan.Zero)) return new ValueTask<int>(result);
-            
+
             // Otherwise, we can use the ValueTask source for real allocation-less asynchronous code.
             // When the timer ends, set the value task as completed.
             _timer = new Timer(_ => { _source.SetResult(result); }, null, delay, Timeout.InfiniteTimeSpan);

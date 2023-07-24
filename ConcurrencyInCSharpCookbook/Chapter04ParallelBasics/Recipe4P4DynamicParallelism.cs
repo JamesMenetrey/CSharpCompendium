@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter4ParallelBasics;
+namespace ConcurrencyInCSharpCookbook.Chapter04ParallelBasics;
 
 /// <summary>
 /// Using <see cref="Task"/> for parallel processing is completely different than using

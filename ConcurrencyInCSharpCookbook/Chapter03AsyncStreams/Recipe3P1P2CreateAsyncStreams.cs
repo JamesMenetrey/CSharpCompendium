@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter3AsyncStreams
+namespace ConcurrencyInCSharpCookbook.Chapter03AsyncStreams
 {
     [TestClass]
     public class Recipe3P1P2CreateAsyncStreams

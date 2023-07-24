@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter8Interop;
+namespace ConcurrencyInCSharpCookbook.Chapter08Interop;
 
 [TestClass]
 public class Recipe8P4AsyncWrapperForParallel

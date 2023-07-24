@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics;
+namespace ConcurrencyInCSharpCookbook.Chapter02AsyncBasics;
 
 [TestClass]
 public class Recipe2P2ReturnCompleteTask
@@ -15,7 +15,7 @@ public class Recipe2P2ReturnCompleteTask
     public async Task DemonstrateSuccessfulTaskWithValue()
     {
         const int value = 42;
-        
+
         var returnedValue = await ReturnSuccessfulTask(value);
         returnedValue.Should().Be(value);
     }
@@ -38,9 +38,23 @@ public class Recipe2P2ReturnCompleteTask
             .Where(e => e.CancellationToken == source.Token);
     }
 
-    private Task ReturnSuccessfulTask() => Task.CompletedTask;
-    private Task<T> ReturnSuccessfulTask<T>(T value) => Task.FromResult(value);
-    private Task ReturnFailedTask() => Task.FromException(new Exception("Task failed"));
+    private Task ReturnSuccessfulTask()
+    {
+        return Task.CompletedTask;
+    }
 
-    private Task ReturnCancelledTask(CancellationToken cancellationToken) => Task.FromCanceled(cancellationToken);
+    private Task<T> ReturnSuccessfulTask<T>(T value)
+    {
+        return Task.FromResult(value);
+    }
+
+    private Task ReturnFailedTask()
+    {
+        return Task.FromException(new Exception("Task failed"));
+    }
+
+    private Task ReturnCancelledTask(CancellationToken cancellationToken)
+    {
+        return Task.FromCanceled(cancellationToken);
+    }
 }
