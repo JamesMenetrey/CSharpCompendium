@@ -29,34 +29,17 @@ public class Recipe13P2ExclusiveScheduler
 
     private async Task MustExecuteConcurrently(TaskFactory factory)
     {
-        var array1 = new int[1000];
-        var array2 = new int[1000];
+        var signal = new ManualResetEventSlim();
 
         var task1 = factory.StartNew(() =>
         {
-            for (var i = 0; i < array1.Length; i++)
-            {
-                ++array1[i];
-                // In the case we are in the last iteration, the tasks2 must have already started.
-                if (i == array1.Length - 1)
-                {
-                    // Only assess the concurrency if more than one core is available.
-                    if (Environment.ProcessorCount > 1)
-                    {
-                        array2[0].Should().BeGreaterThan(0);
-                    }
-                    
-                    Console.WriteLine($">> {Environment.ProcessorCount}");
-                }
-            }
+            var wasSet = signal.Wait(1000);
+            wasSet.Should().BeTrue();
         });
         
         var task2 = factory.StartNew(() =>
         {
-            for (var i = 0; i < array1.Length; i++)
-            {
-                ++array2[i];
-            }
+            signal.Set();
         });
 
         await Task.WhenAll(task1, task2);
@@ -64,28 +47,17 @@ public class Recipe13P2ExclusiveScheduler
     
     private async Task MustExecuteSequentially(TaskFactory factory)
     {
-        var array1 = new int[1000];
-        var array2 = new int[1000];
+        var signal = new ManualResetEventSlim();
 
         var task1 = factory.StartNew(() =>
         {
-            for (var i = 0; i < array1.Length; i++)
-            {
-                ++array1[i];
-                // In the case we are in the last iteration, the tasks2 must NOT have already started.
-                if (i == array1.Length - 1)
-                {
-                    array2[0].Should().Be(0);
-                }
-            }
+            var wasSet = signal.Wait(1000);
+            wasSet.Should().BeFalse();
         });
         
         var task2 = factory.StartNew(() =>
         {
-            for (var i = 0; i < array1.Length; i++)
-            {
-                ++array2[i];
-            }
+            signal.Set();
         });
 
         await Task.WhenAll(task1, task2);
