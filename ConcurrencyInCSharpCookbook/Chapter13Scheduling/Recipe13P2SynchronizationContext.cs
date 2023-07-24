@@ -77,7 +77,15 @@ namespace ConcurrencyInCSharpCookbook.Chapter13Scheduling
 
         // Same tracing methods to prove that our logic works.
         ThreadDumpedInfo Dump() => new (Environment.CurrentManagedThreadId, _localThreadProof);
-        Task<ThreadDumpedInfo> DumpAsync() => Task.Run(Dump);
+        Task<ThreadDumpedInfo> DumpAsync()
+        {
+            return Task.Run(async () =>
+            {
+                var dump = new ThreadDumpedInfo(Environment.CurrentManagedThreadId, _localThreadProof);
+                await Task.Delay(10);
+                return dump;
+            });
+        }
 
         // ReSharper disable once NotAccessedPositionalProperty.Local
         record ThreadDumpedInfo(int ThreadId, int Proof);
