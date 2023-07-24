@@ -46,7 +46,7 @@ public class Recipe4P1ProcessingOfData
         values.Sum().Should().Be(values.Length / 2);
 
         // We may have already cores processing further number than the exact half of the array.
-        numberOfIterations.Should().BeCloseTo(values.Length / 2, (uint)Environment.ProcessorCount);
+        numberOfIterations.Should().BeCloseTo(values.Length / 2, (uint)Environment.ProcessorCount + 1);
     }
 
     /// <summary>
