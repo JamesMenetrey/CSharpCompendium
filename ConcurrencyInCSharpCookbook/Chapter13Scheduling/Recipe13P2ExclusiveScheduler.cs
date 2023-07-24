@@ -17,6 +17,7 @@ public class Recipe13P2ExclusiveScheduler
     {
         // Only assess the concurrency if more than one core is available.
         if (Environment.ProcessorCount < 2) Assert.Inconclusive();
+        Console.WriteLine($">> {Environment.ProcessorCount}");
 
         var scheduler = new ConcurrentExclusiveSchedulerPair();
         var concurrent = scheduler.ConcurrentScheduler;
