@@ -25,7 +25,7 @@ namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics
             SynchronizationContext.SetSynchronizationContext(context);
 
             // The current context is captured by the `await` keyword.
-            await Task.Run(() => Task.CompletedTask);
+            await Task.Run(async () => await Task.Delay(10));
 
             context.HasBeenCalled.Should().BeTrue();
         }
