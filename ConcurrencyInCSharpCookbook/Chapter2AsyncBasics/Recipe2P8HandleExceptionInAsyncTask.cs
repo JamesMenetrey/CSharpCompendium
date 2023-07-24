@@ -20,7 +20,7 @@ namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics
                 await task;
                 Assert.Fail("Must not continue after an exception is thrown.");
             }
-            catch (ExpectedException _)
+            catch (ExpectedException)
             {
                 return;
             }

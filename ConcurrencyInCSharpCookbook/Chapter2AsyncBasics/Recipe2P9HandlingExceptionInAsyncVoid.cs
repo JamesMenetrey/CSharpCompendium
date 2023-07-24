@@ -19,7 +19,7 @@ namespace ConcurrencyInCSharpCookbook.Chapter2AsyncBasics
                 AsyncContext.Run(ThrowVoidAsync);
                 Assert.Fail();
             }
-            catch (ExpectedException _)
+            catch (ExpectedException)
             {
                 return;
             }
